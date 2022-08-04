@@ -1,7 +1,9 @@
 ---
 - name: Converge
   hosts: all
-  tasks:
-    - name: "Include acme.molecule_node"
-      include_role:
-        name: "acme.molecule_node"
+  # tasks:
+  #   - name: "Include acme.molecule_node"
+  #     include_role:
+  #       name: "acme.molecule_node"
+
+- import_playbook: ../../playbook.yml

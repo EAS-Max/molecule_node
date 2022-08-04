@@ -1,2 +1,13 @@
 ---
 # tasks file for molecule_node
+- name: refresh subscription manager
+  command: subscription-manager refresh
+
+- name: clean yum
+  command: yum clean all
+
+- name: install nodejs
+  yum:
+    name: nodejs
+    state: present
+    update_cache: yes
