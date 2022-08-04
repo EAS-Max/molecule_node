@@ -6,8 +6,59 @@
 - name: clean yum
   command: yum clean all
 
+- name: curl node
+  command: curl -sL https://rpm.nodesource.com/setup_14.x
+
+# - name: curl node
+#   command: sudo -E bash -
+
 - name: install nodejs
   yum:
     name: nodejs
     state: present
     update_cache: yes
+
+- name: pull down app
+  become_user: root
+  get_url:
+    url: "https://nexusrm.easlab.co.uk/repository/eas-hosted-bin/trainee-challenge-node-app-main.tar.gz"
+    dest: /home/user/
+    validate_certs: no
+
+- name: untar file
+  command: cd /home/user/
+
+- name: untar file
+  command: tar -xf /home/user/trainee-challenge-node-app-main.tar.gz
+
+- name: install dependency
+  command: npm i /home/user/trainee-challenge-node-app-main
+
+- name: make app a service
+  become_user: root
+  blockinfile:
+    dest: /lib/systemd/system/app.service
+    block: |
+      [Unit]
+      Description= Service
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=root
+      WorkingDirectory=/home/user/trainee-challenge-node-app-main
+      ExecStart=node //home/user/trainee-challenge-node-app-main/index.js
+      Restart=on-abort
+
+      [Install]
+      WantedBy=multi-user.target
+    create: yes
+
+- name: daemon-reload
+  command: systemctl daemon-reload
+
+- name: enable my app on start up
+  command: systemctl enable app
+
+- name: start my app on start up
+  command: systemctl start java-app
