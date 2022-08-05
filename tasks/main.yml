@@ -6,8 +6,8 @@
 - name: clean yum
   command: yum clean all
 
-- name: curl node
-  command: curl -sL https://rpm.nodesource.com/setup_14.x
+- name: curl node and run bash script
+  shell: curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash -
 
 # - name: curl node
 #   command: sudo -E bash -
@@ -18,26 +18,44 @@
     state: present
     update_cache: yes
 
-- name: pull down app
+- name: "Make directory"
   become_user: root
-  get_url:
-    url: "https://nexusrm.easlab.co.uk/repository/eas-hosted-bin/trainee-challenge-node-app-main.tar.gz"
-    dest: /home/user/
-    validate_certs: no
+  ansible.builtin.file:
+    path: /opt/trainee-challenge-node-app
+    state: directory
 
-- name: untar file
-  command: cd /home/user/
+- name: pull down app
+  ansible.builtin.unarchive:
+    src: "https://nexusrm.easlab.co.uk/repository/eas-hosted-bin/trainee-challenge-node-app-main.tar.gz"
+    dest: /opt/trainee-challenge-node-app/
+    remote_src: yes
 
-- name: untar file
-  command: tar -xf /home/user/trainee-challenge-node-app-main.tar.gz
+- name: do not permit traffic in default zone on port 8081/tcp
+  ansible.posix.firewalld:
+    port: 80/tcp
+    permanent: yes
+    state: enabled
 
-- name: install dependency
-  command: npm i /home/user/trainee-challenge-node-app-main
+# - name: untar file
+#   command: cd /home/user/
+
+# - name: untar file
+#   command: tar -xf trainee-challenge-node-app-main.tar.gz
+
+# - name: install dependency
+#   command: npm i /home/user/trainee-challenge-node-app-main /opt/trainee-challenge-node-app
+
+- name: make it executable
+  file: dest=/opt/trainee-challenge-node-app/trainee-challenge-node-app-main/index.js mode=a+x
+
+- name: Install packages
+  npm:
+    path: /opt/trainee-challenge-node-app/trainee-challenge-node-app-main
 
 - name: make app a service
   become_user: root
   blockinfile:
-    dest: /lib/systemd/system/app.service
+    dest: /etc/systemd/system/app.service
     block: |
       [Unit]
       Description= Service
@@ -47,18 +65,35 @@
       Type=simple
       User=root
       WorkingDirectory=/home/user/trainee-challenge-node-app-main
-      ExecStart=node //home/user/trainee-challenge-node-app-main/index.js
+      ExecStart= /usr/bin/node /opt/trainee-challenge-node-app/trainee-challenge-node-app-main
+      Environment=TARGET_URL=HTTP://10.0.0.1
+      Environment=PORT=80
+      WorkingDirectory=/opt/trainee-challenge-node-app/trainee-challenge-node-app-main
       Restart=on-abort
 
       [Install]
       WantedBy=multi-user.target
     create: yes
-
+#{{ hostvars['max-node'].ansible_all_ipv4_addresses[1] }}
 - name: daemon-reload
   command: systemctl daemon-reload
 
-- name: enable my app on start up
-  command: systemctl enable app
+- name: reset firewall
+  systemd:
+    name: firewalld
+    state: reloaded
+# - name: enable my app on start up
+#   command: systemctl enable app
 
-- name: start my app on start up
-  command: systemctl start java-app
+# - name: start my app on start up
+#   command: systemctl start app
+
+- name: enable app
+  ansible.builtin.service:
+    name: app
+    enabled: yes
+
+- name: restart and enable app
+  ansible.builtin.service:
+    name: app
+    state: restarted
