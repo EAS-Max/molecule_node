@@ -7,7 +7,7 @@
   command: yum clean all
 
 - name: curl node and run bash script
-  shell: curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash -
+  shell: curl -sL {{ node_location }} | sudo -E bash -
 
 # - name: curl node
 #   command: sudo -E bash -
@@ -26,7 +26,7 @@
 
 - name: pull down app
   ansible.builtin.unarchive:
-    src: "https://nexusrm.easlab.co.uk/repository/eas-hosted-bin/trainee-challenge-node-app-main.tar.gz"
+    src: "{{ app_location }}"
     dest: /opt/trainee-challenge-node-app/
     remote_src: yes
 
@@ -66,7 +66,7 @@
       User=root
       WorkingDirectory=/home/user/trainee-challenge-node-app-main
       ExecStart= /usr/bin/node /opt/trainee-challenge-node-app/trainee-challenge-node-app-main
-      Environment=TARGET_URL=HTTP://10.0.0.1
+      Environment=TARGET_URL=HTTP://10.0.0.24
       Environment=PORT=80
       WorkingDirectory=/opt/trainee-challenge-node-app/trainee-challenge-node-app-main
       Restart=on-abort
