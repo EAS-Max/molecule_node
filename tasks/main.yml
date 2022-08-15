@@ -28,7 +28,6 @@
   get_url:
     url: "{{ app_location }}"
     dest: /opt/trainee-challenge-node-app/
-    remote_src: yes
 
 - name: pull down app
   ansible.builtin.unarchive:
