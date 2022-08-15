@@ -29,9 +29,9 @@
     url: "{{ app_location }}"
     dest: /opt/trainee-challenge-node-app/
 
-- name: pull down app
+- name: pull down app untar
   ansible.builtin.unarchive:
-    src: /opt/trainee-challenge-node-app/
+    src: /opt/trainee-challenge-node-app/trainee-challenge-node-app-main.tar.gz
     dest: /tmp/
     remote_src: yes
 
@@ -51,11 +51,11 @@
 #   command: npm i /home/user/trainee-challenge-node-app-main /opt/trainee-challenge-node-app
 
 - name: make it executable
-  file: dest=/opt/trainee-challenge-node-app/trainee-challenge-node-app-main/index.js mode=a+x
+  file: dest=/tmp/trainee-challenge-node-app-main/index.js mode=a+x
 
 - name: Install packages
   npm:
-    path: /opt/trainee-challenge-node-app/trainee-challenge-node-app-main
+    path: /tmp/trainee-challenge-node-app-main
 
 - name: make app a service
   become_user: root
@@ -70,10 +70,10 @@
       Type=simple
       User=root
       WorkingDirectory=/home/user/trainee-challenge-node-app-main
-      ExecStart= /usr/bin/node /opt/trainee-challenge-node-app/trainee-challenge-node-app-main
+      ExecStart= /usr/bin/node /tmp/trainee-challenge-node-app-main
       Environment=TARGET_URL=HTTP://10.0.0.24
       Environment=PORT=80
-      WorkingDirectory=/opt/trainee-challenge-node-app/trainee-challenge-node-app-main
+      WorkingDirectory=/tmp/trainee-challenge-node-app-main
       Restart=on-abort
 
       [Install]
