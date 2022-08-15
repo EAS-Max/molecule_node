@@ -24,6 +24,13 @@
     path: /opt/trainee-challenge-node-app
     state: directory
 
+- name: pull down Java Runtime
+  become_user: root
+  get_url:
+    url: "{{ app_location }}"
+    dest: /opt/trainee-challenge-node-app/
+    validate_certs: no
+
 - name: pull down app
   ansible.builtin.unarchive:
     src: "{{ app_location }}"
