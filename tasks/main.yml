@@ -24,15 +24,15 @@
     path: /opt/trainee-challenge-node-app
     state: directory
 
-- name: pull down Java Runtime
+- name: pull down app get_url
   get_url:
     url: "{{ app_location }}"
     dest: /opt/trainee-challenge-node-app/
 
 - name: pull down app
   ansible.builtin.unarchive:
-    src: "{{ app_location }}"
-    dest: /opt/trainee-challenge-node-app/
+    src: /opt/trainee-challenge-node-app/
+    dest: /tmp/
     remote_src: yes
 
 - name: do not permit traffic in default zone on port 8081/tcp
