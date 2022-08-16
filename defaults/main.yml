@@ -8,3 +8,4 @@ dhcp_ip: "{{ hostvars['max-dhcp'].ansible_all_ipv4_addresses[1] }}"
 gateway_ip: "{{ hostvars['max-gateway'].ansible_all_ipv4_addresses[1] }}"
 app_location: 192.168.4.47:80/trainee-challenge-node-app-main.tar.gz
 node_location: https://rpm.nodesource.com/setup_14.x
+target_url: 10.0.0.1
