@@ -71,7 +71,7 @@
       User=root
       WorkingDirectory=/home/user/trainee-challenge-node-app-main
       ExecStart= /usr/bin/node /tmp/trainee-challenge-node-app-main
-      Environment=TARGET_URL=HTTP//:{{ node_target }}.{{ domain }}.{{ domain_area }}
+      Environment=TARGET_URL=HTTP://{{ node_target }}.{{ domain }}.{{ domain_area }}
       Environment=PORT=80
       WorkingDirectory=/tmp/trainee-challenge-node-app-main
       Restart=on-abort
